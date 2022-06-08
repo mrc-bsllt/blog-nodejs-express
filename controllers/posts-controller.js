@@ -1,4 +1,5 @@
 const Post = require('../models/Post')
+const { validationResult } = require('express-validator')
 
 const GET_fetchPosts = (req, res, next) => {
   Post.find().then(posts => {
@@ -7,7 +8,12 @@ const GET_fetchPosts = (req, res, next) => {
 }
 
 const POST_createPost = (req, res, next) => {
-  const user_id = req.user._id
+  const errors = validationResult(req)
+  if(!errors.isEmpty()) {
+    return res.status(422).json(errors)
+  }
+
+  // const user_id = req.user._id
   const { title, image_url, content, author } = req.body
   const created_at = new Date()
   const updated_at = new Date()
