@@ -2,7 +2,7 @@ const Post = require('../models/Post')
 
 const GET_fetchPosts = (req, res, next) => {
   Post.find().then(posts => {
-    res.status(200).json(posts)
+    res.status(200).json({ posts })
   }).catch(error => console.log(error))
 }
 
