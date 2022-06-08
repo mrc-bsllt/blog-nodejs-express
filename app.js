@@ -20,7 +20,7 @@ app.use((req, res, next) => {
 
 // API MIDDLEWARE
 app.use('/api', postsRoutes)
-
+console.log(new Date())
 mongoose.connect(`${MONGODB_URI}?retryWrites=true&w=majority`).then(() => {
-  app.listen(3000)
+  app.listen(8080)
 }).catch(error => console.log(error))
