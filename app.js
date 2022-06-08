@@ -1,9 +1,13 @@
 const express = require('express')
+// MongoDb connection
+const mongoose = require('mongoose')
+const MONGODB_URI = 'mongodb+srv://mrc-bsllt:marcodevelon@cluster0.slrwb.mongodb.net/blog'
+
 const app = express()
 const bodyParser = require('body-parser')
 
 // IMPORT API
-const { getAPI } = require('./api/get')
+const { postsRoutes } = require('./api/posts')
 
 // GENERAL MIDDLEWARE
 app.use(bodyParser.json())
@@ -15,6 +19,8 @@ app.use((req, res, next) => {
 })
 
 // API MIDDLEWARE
-app.use('/api', getAPI)
+app.use('/api', postsRoutes)
 
-app.listen(8080)
+mongoose.connect(`${MONGODB_URI}?retryWrites=true&w=majority`).then(() => {
+  app.listen(3000)
+}).catch(error => console.log(error))
