@@ -7,10 +7,19 @@ const GET_fetchPosts = (req, res, next) => {
   }).catch(error => console.log(error))
 }
 
+const GET_singlePost = (req, res, next) => {
+  const post_id = req.params.post_id
+  Post.findOne({ _id: post_id }).then(post => {
+    res.status(200).json({ post })
+  }).catch(error => {
+    res.status(404).json({ message: error.message })
+  })
+}
+
 const POST_createPost = (req, res, next) => {
   const errors = validationResult(req)
   if(!errors.isEmpty()) {
-    return res.status(422).json(errors)
+    return res.status(422).json({ errors: errors.array() })
   }
 
   // const user_id = req.user._id
@@ -24,4 +33,4 @@ const POST_createPost = (req, res, next) => {
   }).catch(error => console.log(error))
 }
 
-module.exports = { GET_fetchPosts, POST_createPost }
+module.exports = { GET_fetchPosts, GET_singlePost, POST_createPost }
