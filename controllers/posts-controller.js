@@ -19,7 +19,6 @@ const GET_singlePost = (req, res, next) => {
 
 const POST_createPost = (req, res, next) => {
   const errors = validationResult(req)
-  
   if(!errors.isEmpty()) {
     return res.status(422).json({ errors: errors.array() })
   }
@@ -37,6 +36,11 @@ const POST_createPost = (req, res, next) => {
 }
 
 const PUT_editPost = (req, res, next) => {
+  const errors = validationResult(req)
+  if(!errors.isEmpty()) {
+    return res.status(422).json({ errors: errors.array() })
+  }
+
   const post_id = req.params.post_id
   Post.findOne({ _id: post_id }).then(post => {
     if(req.file) {
@@ -53,4 +57,12 @@ const PUT_editPost = (req, res, next) => {
   }).catch(error => console.log(error))
 }
 
-module.exports = { GET_fetchPosts, GET_singlePost, POST_createPost, PUT_editPost }
+const DELETE_deletePost = (req, res, next) => {
+  const post_id = req.params.post_id
+  Post.findOneAndDelete({ _id: post_id }).then(post => {
+    deleteImage(post.image_url)
+    res.status(204).json({ message: 'Post deleted!' })
+  }).catch(error => console.log(error))
+}
+
+module.exports = { GET_fetchPosts, GET_singlePost, POST_createPost, PUT_editPost, DELETE_deletePost }
