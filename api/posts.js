@@ -10,7 +10,6 @@ router.get('/post/:post_id', GET_singlePost)
 router.post('/create-post', [
   check('title', 'Title must be min 5 characters long!').isLength({ min: 5 }),
   check('image_url').custom((_, { req }) => {
-    console.log(req.file === undefined)
     if(req.file === undefined) {
       return Promise.reject('Image must be .png, .jpg or .jpeg')
     } else {
