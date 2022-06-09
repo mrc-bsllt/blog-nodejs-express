@@ -1,6 +1,5 @@
-const fs = require('fs')
-const path = require('path')
 const Post = require('../models/Post')
+const deleteImage = require('../utils/delete-file')
 const { validationResult } = require('express-validator')
 
 const GET_fetchPosts = (req, res, next) => {
@@ -41,12 +40,7 @@ const PUT_editPost = (req, res, next) => {
   const post_id = req.params.post_id
   Post.findOne({ _id: post_id }).then(post => {
     if(req.file) {
-      const deletePath = path.join(__dirname, '..', post.image_url)
-      fs.unlink(deletePath, (error) => {
-        if(error) {
-          throw(error)
-        }
-      })
+      deleteImage(post.image_url)
       post.image_url = '/' + req.file.path
     }
     const { title, content } = req.body
