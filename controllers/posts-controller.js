@@ -3,8 +3,17 @@ const deleteImage = require('../utils/delete-file')
 const { validationResult } = require('express-validator')
 
 const GET_fetchPosts = (req, res, next) => {
-  Post.find().then(posts => {
-    res.status(200).json({ posts })
+  const limit = +req.query.limit || 2
+  const page = +req.query.page || 1
+  let total_items
+  let total_pages
+  Post.countDocuments().then(count => {
+    total_items = count
+    total_pages = Math.floor(total_items / limit)
+
+    return Post.find().skip((page - 1) * limit).limit(limit)
+  }).then(posts => {
+    res.status(200).json({ posts, total_pages })
   }).catch(error => console.log(error))
 }
 
