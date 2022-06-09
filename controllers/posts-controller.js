@@ -1,3 +1,5 @@
+const fs = require('fs')
+const path = require('path')
 const Post = require('../models/Post')
 const { validationResult } = require('express-validator')
 
@@ -35,4 +37,26 @@ const POST_createPost = (req, res, next) => {
   }).catch(error => console.log(error))
 }
 
-module.exports = { GET_fetchPosts, GET_singlePost, POST_createPost }
+const PUT_editPost = (req, res, next) => {
+  const post_id = req.params.post_id
+  Post.findOne({ _id: post_id }).then(post => {
+    if(req.file) {
+      const deletePath = path.join(__dirname, '..', post.image_url)
+      fs.unlink(deletePath, (error) => {
+        if(error) {
+          throw(error)
+        }
+      })
+      post.image_url = '/' + req.file.path
+    }
+    const { title, content } = req.body
+
+    post.title = title
+    post.content = content
+    return post.save()
+  }).then(post => {
+    res.status(200).json({ message: 'Post updated!', post })
+  }).catch(error => console.log(error))
+}
+
+module.exports = { GET_fetchPosts, GET_singlePost, POST_createPost, PUT_editPost }

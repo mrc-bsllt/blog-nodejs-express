@@ -2,7 +2,7 @@ const express = require('express')
 const router = express.Router()
 const { check } = require('express-validator')
 
-const { GET_fetchPosts, GET_singlePost, POST_createPost } = require('../controllers/posts-controller')
+const { GET_fetchPosts, GET_singlePost, POST_createPost, PUT_editPost } = require('../controllers/posts-controller')
 
 router.get('/posts', GET_fetchPosts)
 router.get('/post/:post_id', GET_singlePost)
@@ -18,5 +18,7 @@ router.post('/create-post', [
   })
 ], POST_createPost
 )
+
+router.put('/post/:post_id', PUT_editPost)
 
 module.exports = { postsRoutes: router }
