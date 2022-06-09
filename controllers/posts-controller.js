@@ -18,6 +18,7 @@ const GET_singlePost = (req, res, next) => {
 
 const POST_createPost = (req, res, next) => {
   const errors = validationResult(req)
+  
   if(!errors.isEmpty()) {
     return res.status(422).json({ errors: errors.array() })
   }
@@ -25,6 +26,7 @@ const POST_createPost = (req, res, next) => {
   // const user_id = req.user._id
   const { title, content, author = 'Non ancora inserito' } = req.body
   const image_url = '/' + req.file.path
+  console.log(image_url)
   const created_at = new Date()
   const updated_at = new Date()
   const post = new Post({ title, image_url, content, author, created_at, updated_at })
