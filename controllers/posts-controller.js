@@ -9,10 +9,11 @@ const GET_fetchPosts = (req, res, next) => {
   let total_items
   let total_pages
   Post.countDocuments().then(count => {
+    const user_id = req.user_id
     total_items = count
     total_pages = Math.floor(total_items / limit)
 
-    return Post.find().skip((page - 1) * limit).limit(limit)
+    return Post.find({ user_id }).skip((page - 1) * limit).limit(limit)
   }).then(posts => {
     res.status(200).json({ posts, total_pages })
   }).catch(error => console.log(error))
@@ -43,6 +44,10 @@ const POST_createPost = async (req, res, next) => {
   const updated_at = new Date()
   const post = new Post({ title, image_url, content, author, user_id, created_at, updated_at })
 
+  // associo il nuovo post al model dello user
+  user.posts.push(post)
+  await user.save()
+
   post.save().then(post => {
     res.status(201).json({ message: 'post created', post })
   }).catch(error => console.log(error))
@@ -70,12 +75,18 @@ const PUT_editPost = (req, res, next) => {
   }).catch(error => console.log(error))
 }
 
-const DELETE_deletePost = (req, res, next) => {
+const DELETE_deletePost = async (req, res, next) => {
   const post_id = req.params.post_id
-  Post.findOneAndDelete({ _id: post_id }).then(post => {
-    deleteImage(post.image_url)
-    res.status(204).json({ message: 'Post deleted!' })
-  }).catch(error => console.log(error))
+  const deletedPost = await Post.findOneAndDelete({ _id: post_id })
+  const user = await User.findById(deletedPost.user_id)
+
+  const index_deletedPost = user.posts.findIndex(post_id => post_id === deletedPost._id)
+  user.posts.splice(index_deletedPost, 1)
+
+  user.save()
+  deleteImage(deletedPost.image_url)
+
+  res.status(204).json({ message: 'Post deleted!' })
 }
 
 module.exports = { GET_fetchPosts, GET_singlePost, POST_createPost, PUT_editPost, DELETE_deletePost }

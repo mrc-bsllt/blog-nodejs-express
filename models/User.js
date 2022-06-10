@@ -6,7 +6,8 @@ const userSchema =new Schema({
   email: { type: String, required: true },
   password: { type: String, required: true },
   posts: [{ 
-    post_id: { type: Schema.Types.ObjectId, ref: 'Post' }
+    type: Schema.Types.ObjectId, 
+    ref: 'Post'
   }]
 })
 
