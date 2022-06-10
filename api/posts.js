@@ -3,9 +3,10 @@ const router = express.Router()
 const { check } = require('express-validator')
 
 const { GET_fetchPosts, GET_singlePost, POST_createPost, PUT_editPost, DELETE_deletePost } = require('../controllers/posts-controller')
+const is_auth = require('../middleware/is-auth')
 
-router.get('/posts', GET_fetchPosts)
-router.get('/post/:post_id', GET_singlePost)
+router.get('/posts', is_auth, GET_fetchPosts)
+router.get('/post/:post_id', is_auth, GET_singlePost)
 
 router.post('/create-post', [
   check('title', 'Title must be min 5 characters long!').isLength({ min: 5 }),
@@ -19,16 +20,17 @@ router.post('/create-post', [
 ], POST_createPost
 )
 
-router.put('/post/:post_id', [
-  check('title', 'Title must be min 5 characters long!').isLength({ min: 5 }),
-  check('image_url').custom((_, { req }) => {
-    if(!req.file && !req.body.image_url) {
-      return Promise.reject('Image must be .png, .jpg or .jpeg')
-    } else {
-      return true
-    }
-  })
-], PUT_editPost
+router.put('/post/:post_id', is_auth, 
+  [
+    check('title', 'Title must be min 5 characters long!').isLength({ min: 5 }),
+    check('image_url').custom((_, { req }) => {
+      if(!req.file && !req.body.image_url) {
+        return Promise.reject('Image must be .png, .jpg or .jpeg')
+      } else {
+        return true
+      }
+    })
+  ], PUT_editPost
 )
 
 router.delete('/delete-post/:post_id', DELETE_deletePost)
