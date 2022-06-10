@@ -10,12 +10,16 @@ const POST_signup = async (req, res, next) => {
   }
 
   const { username, email, password } = req.body
-  const hashedpassword = await bcrypt.hash(password, 12)
-
-  const user = new User({ username, email, password: hashedpassword, posts: [] })
-  user.save().then(user => {
+  try {
+    const hashedpassword = await bcrypt.hash(password, 12)
+  
+    const user = new User({ username, email, password: hashedpassword, posts: [] })
+    await user.save()
+  
     res.status(201).json({ message: "User created!" })
-  }).catch(error => console.log(error))
+  } catch(error) {
+    console.log(error)
+  }
 }
 
 const POST_login = async (req, res, next) => {
@@ -23,13 +27,18 @@ const POST_login = async (req, res, next) => {
   if(!errors.isEmpty()) {
     return res.status(422).json({ errors: errors.array() })
   }
+
   const { email } = req.body
-  const user = await User.findOne({ email })
-  const user_id = user._id.toString()
-
-  const token = jsonToken.sign({ user_id, email }, 'supersecretstring', { expiresIn: '1h' })
-
-  return res.status(200).json({ token, user_id, message: 'Successfully Authenticated!' })
+  try {
+    const user = await User.findOne({ email })
+    const user_id = user._id.toString()
+  
+    const token = jsonToken.sign({ user_id, email }, 'supersecretstring', { expiresIn: '1h' })
+  
+    res.status(200).json({ token, user_id, message: 'Successfully Authenticated!' })
+  } catch(error) {
+    console.log(error)
+  }
 }
 
 module.exports = { POST_signup, POST_login }
