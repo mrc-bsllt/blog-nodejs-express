@@ -28,6 +28,7 @@ const bodyParser = require('body-parser')
 
 // IMPORT API ---------------------------------------------- 
 const { postsRoutes } = require('./api/posts')
+const { authRoutes } = require('./api/auth')
 
 // GENERAL MIDDLEWARE ----------------------------------------------
 app.use(bodyParser.json())
@@ -43,6 +44,7 @@ app.use('/storage/images', express.static(path.join(__dirname, 'storage/images')
 
 // API MIDDLEWARE ----------------------------------------------
 app.use('/api', postsRoutes)
+app.use('/api/auth', authRoutes)
 
 mongoose.connect(`${MONGODB_URI}?retryWrites=true&w=majority`).then(() => {
   app.listen(8080)
