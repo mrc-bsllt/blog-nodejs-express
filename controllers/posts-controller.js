@@ -1,4 +1,5 @@
 const Post = require('../models/Post')
+const User = require('../models/User')
 const deleteImage = require('../utils/delete-file')
 const { validationResult } = require('express-validator')
 
@@ -26,18 +27,21 @@ const GET_singlePost = (req, res, next) => {
   })
 }
 
-const POST_createPost = (req, res, next) => {
+const POST_createPost = async (req, res, next) => {
   const errors = validationResult(req)
   if(!errors.isEmpty()) {
     return res.status(422).json({ errors: errors.array() })
   }
   
-  // const user_id = req.user._id
-  const { title, content, author = 'Non ancora inserito' } = req.body
+  const user_id = req.user_id
+  const user = await User.findById(user_id)
+  
+  const { title, content } = req.body
   const image_url = '/' + req.file.path
+  const author = user.username
   const created_at = new Date()
   const updated_at = new Date()
-  const post = new Post({ title, image_url, content, author, created_at, updated_at })
+  const post = new Post({ title, image_url, content, author, user_id, created_at, updated_at })
 
   post.save().then(post => {
     res.status(201).json({ message: 'post created', post })

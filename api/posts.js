@@ -8,7 +8,7 @@ const is_auth = require('../middleware/is-auth')
 router.get('/posts', is_auth, GET_fetchPosts)
 router.get('/post/:post_id', is_auth, GET_singlePost)
 
-router.post('/create-post', [
+router.post('/create-post', is_auth, [
   check('title', 'Title must be min 5 characters long!').isLength({ min: 5 }),
   check('image_url').custom((_, { req }) => {
     if(req.file === undefined) {
