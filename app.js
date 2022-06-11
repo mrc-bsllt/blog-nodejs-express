@@ -47,5 +47,13 @@ app.use('/api', postsRoutes)
 app.use('/api/auth', authRoutes)
 
 mongoose.connect(`${MONGODB_URI}?retryWrites=true&w=majority`).then(() => {
-  app.listen(8080)
+  // app.listen(8080)
+
+  // Dopo aver installato socket.io, la configurazione diventa questo
+  const server = app.listen(8080)
+  const socket_io = require('./socket').init(server)
+  
+  socket_io.on('connection', socket => {
+    console.log('Client connected!')
+  })
 }).catch(error => console.log(error))

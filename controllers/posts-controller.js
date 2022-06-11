@@ -2,6 +2,7 @@ const Post = require('../models/Post')
 const User = require('../models/User')
 const deleteImage = require('../utils/delete-file')
 const { validationResult } = require('express-validator')
+const io = require('../socket')
 
 const GET_fetchPosts = async (req, res, next) => {
   const user_id = req.user_id
@@ -53,6 +54,9 @@ const POST_createPost = async (req, res, next) => {
     // associo il nuovo post al model dello user
     user.posts.push(post)
     await Promise.all([user.save(), post.save()])
+    
+    io.getIO().emit('posts', { action: 'create', user_id: req.user_id })
+    
     res.status(201).json({ message: 'post created', post })
   } catch(error) {
     res.status(409).json({ message: error.message })
